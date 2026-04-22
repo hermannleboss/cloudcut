@@ -48,7 +48,28 @@ export default {
 				);
 			}
 
-			const shortCode = crypto.randomUUID().slice(0, 8);
+			let shortCode = "";
+			for (let attempt = 0; attempt < 5; attempt++) {
+				const candidate = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+				try {
+					await env.cloudcut_db
+						.prepare("INSERT INTO links (short_code, original_url) VALUES (?1, ?2)")
+						.bind(candidate, target.toString())
+						.run();
+					shortCode = candidate;
+					break;
+				} catch (error) {
+					if (isUniqueConstraintError(error)) {
+						continue;
+					}
+					return Response.json({ error: "Failed to save short link" }, { status: 500 });
+				}
+			}
+
+			if (!shortCode) {
+				return Response.json({ error: "Failed to generate short code" }, { status: 500 });
+			}
+
 			const shortUrl = `${url.origin}/${shortCode}`;
 
 			return Response.json(
@@ -61,6 +82,34 @@ export default {
 			);
 		}
 
+		if (request.method === "GET") {
+			const shortCode = url.pathname.slice(1);
+			if (shortCode && !shortCode.includes("/")) {
+				const record = await env.cloudcut_db
+					.prepare("SELECT original_url FROM links WHERE short_code = ?1 LIMIT 1")
+					.bind(shortCode)
+					.first<{ original_url: string }>();
+
+				if (!record) {
+					return new Response("Not Found", { status: 404 });
+				}
+
+				await env.cloudcut_db
+					.prepare("UPDATE links SET visit_count = visit_count + 1 WHERE short_code = ?1")
+					.bind(shortCode)
+					.run();
+
+				return Response.redirect(record.original_url, 302);
+			}
+		}
+
 		return new Response("Hello World!");
 	},
 } satisfies ExportedHandler<Env>;
+
+function isUniqueConstraintError(error: unknown): boolean {
+	if (!(error instanceof Error)) {
+		return false;
+	}
+	return error.message.includes("UNIQUE constraint failed");
+}
