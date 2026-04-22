@@ -1,0 +1,48 @@
+meta {
+  name: 02_post_shorten_success
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "url": "https://example.org/very/long/path"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 201", function () {
+    expect(res.status).to.equal(201);
+  });
+
+  test("response should contain shortCode and shortUrl", function () {
+    expect(res.body).to.have.property("shortCode");
+    expect(res.body.shortCode).to.be.a("string");
+    expect(res.body.shortCode).to.match(/^[a-f0-9]{8}$/i);
+    expect(res.body).to.have.property("shortUrl");
+    expect(res.body.shortUrl).to.match(/^https?:\/\/.+\/[a-f0-9]{8}$/i);
+    expect(res.body.originalUrl).to.equal("https://example.org/very/long/path");
+  });
+
+  test("store short_code for next requests", function () {
+    bru.setVar("short_code", res.body.shortCode);
+    expect(bru.getVar("short_code")).to.equal(res.body.shortCode);
+  });
+}

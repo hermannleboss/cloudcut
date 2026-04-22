@@ -1,0 +1,28 @@
+meta {
+  name: 08_get_short_code_not_found
+  type: http
+  seq: 8
+}
+
+get {
+  url: https://cloudcut.hermannleboss.workers.dev/doesnotexist
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 404", function () {
+    expect(res.status).to.equal(404);
+  });
+
+  test("body should be Not Found", function () {
+    expect(res.body).to.equal("Not Found");
+  });
+}

@@ -1,0 +1,38 @@
+meta {
+  name: 05_post_shorten_missing_url
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "notUrl": "https://example.org"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 400", function () {
+    expect(res.status).to.equal(400);
+  });
+
+  test("error should mention required url field", function () {
+    expect(res.body.error).to.equal("Field 'url' is required");
+  });
+}

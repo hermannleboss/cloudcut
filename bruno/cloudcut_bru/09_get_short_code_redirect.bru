@@ -1,0 +1,35 @@
+meta {
+  name: 09_get_short_code_redirect
+  type: http
+  seq: 9
+}
+
+get {
+  url: https://cloudcut.hermannleboss.workers.dev/{{short_code}}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: false
+  maxRedirects: 0
+}
+
+tests {
+  test("short_code variable should be present", function () {
+    expect(bru.getVar("short_code")).to.be.a("string");
+    expect(bru.getVar("short_code").length).to.be.greaterThan(0);
+  });
+
+  test("status should be 302", function () {
+    expect(res.status).to.equal(302);
+  });
+
+  test("location header should contain target URL", function () {
+    const location = res.getHeader("location");
+    expect(location).to.be.a("string");
+    expect(location.startsWith("http://") || location.startsWith("https://")).to.equal(true);
+  });
+}

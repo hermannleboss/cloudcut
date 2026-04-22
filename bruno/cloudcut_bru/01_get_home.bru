@@ -1,0 +1,28 @@
+meta {
+  name: 01_get_home
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://cloudcut.hermannleboss.workers.dev/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("body should be Hello World", function () {
+    expect(res.body).to.equal("Hello World!");
+  });
+}

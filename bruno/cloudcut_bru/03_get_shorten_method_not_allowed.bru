@@ -1,0 +1,32 @@
+meta {
+  name: 03_get_shorten_method_not_allowed
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 405", function () {
+    expect(res.status).to.equal(405);
+  });
+
+  test("allow header should contain POST", function () {
+    expect(res.getHeader("allow")).to.equal("POST");
+  });
+
+  test("error message should be method not allowed", function () {
+    expect(res.body.error).to.equal("Method not allowed");
+  });
+}

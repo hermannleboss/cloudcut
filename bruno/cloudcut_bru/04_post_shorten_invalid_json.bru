@@ -1,0 +1,36 @@
+meta {
+  name: 04_post_shorten_invalid_json
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  body: text
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  { invalid json }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 400", function () {
+    expect(res.status).to.equal(400);
+  });
+
+  test("error should mention invalid json body", function () {
+    expect(res.body.error).to.equal("Invalid JSON body");
+  });
+}
