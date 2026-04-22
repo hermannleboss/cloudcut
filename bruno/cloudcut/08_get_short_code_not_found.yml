@@ -8,6 +8,18 @@ http:
   url: https://cloudcut.hermannleboss.workers.dev/doesnotexist
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status should be 404", function() {
+          expect(res.status).to.equal(404);
+        });
+
+        test("body should be Not Found", function() {
+          expect(res.body).to.equal("Not Found");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

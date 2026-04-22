@@ -8,6 +8,22 @@ http:
   url: https://cloudcut.hermannleboss.workers.dev/api/shorten
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status should be 405", function() {
+          expect(res.status).to.equal(405);
+        });
+
+        test("allow header should contain POST", function() {
+          expect(res.getHeader("allow")).to.equal("POST");
+        });
+
+        test("error message should be method not allowed", function() {
+          expect(res.body.error).to.equal("Method not allowed");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

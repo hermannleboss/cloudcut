@@ -14,6 +14,18 @@ http:
     raw: |
       { invalid json }
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status should be 400", function() {
+          expect(res.status).to.equal(400);
+        });
+
+        test("error should mention invalid json body", function() {
+          expect(res.body.error).to.equal("Invalid JSON body");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

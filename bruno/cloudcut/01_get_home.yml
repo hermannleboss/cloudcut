@@ -8,6 +8,18 @@ http:
   url: https://cloudcut.hermannleboss.workers.dev/
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status should be 200", function() {
+          expect(res.status).to.equal(200);
+        });
+
+        test("body should be Hello World", function() {
+          expect(res.body).to.equal("Hello World!");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

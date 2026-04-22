@@ -8,6 +8,25 @@ http:
   url: https://cloudcut.hermannleboss.workers.dev/{{short_code}}
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("short_code variable should be present", function() {
+          expect(bru.getVar("short_code")).to.be.a("string");
+          expect(bru.getVar("short_code").length).to.be.greaterThan(0);
+        });
+
+        test("status should be 302", function() {
+          expect(res.status).to.equal(302);
+        });
+
+        test("location header should contain target URL", function() {
+          const location = res.getHeader("location");
+          expect(location).to.be.a("string");
+          expect(location.startsWith("http://") || location.startsWith("https://")).to.equal(true);
+        });
+
 settings:
   encodeUrl: true
   timeout: 0
