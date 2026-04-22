@@ -1,0 +1,28 @@
+meta {
+  name: 11_get_stats_not_found
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/stats/deadbeef
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("status should be 404", function () {
+    expect(res.status).to.equal(404);
+  });
+
+  test("error should mention unknown short code", function () {
+    expect(res.body.error).to.equal("Short code not found");
+  });
+}

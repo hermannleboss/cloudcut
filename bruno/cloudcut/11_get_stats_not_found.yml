@@ -1,0 +1,27 @@
+info:
+  name: 11_get_stats_not_found
+  type: http
+  seq: 11
+
+http:
+  method: GET
+  url: https://cloudcut.hermannleboss.workers.dev/api/stats/deadbeef
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status should be 404", function() {
+          expect(res.status).to.equal(404);
+        });
+
+        test("error should mention unknown short code", function() {
+          expect(res.body.error).to.equal("Short code not found");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,37 @@
+meta {
+  name: 10_get_stats_success
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/stats/{{short_code}}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+}
+
+tests {
+  test("short_code variable should be present", function () {
+    expect(bru.getVar("short_code")).to.be.a("string");
+    expect(bru.getVar("short_code").length).to.be.greaterThan(0);
+  });
+
+  test("status should be 200", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("stats response should match the created link", function () {
+    expect(res.body.code).to.equal(bru.getVar("short_code"));
+    expect(res.body.originalUrl).to.equal("https://example.org/very/long/path");
+    expect(res.body.createdAt).to.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+    expect(res.body.clicks).to.be.a("number");
+    expect(res.body.clicks).to.be.greaterThan(-1);
+  });
+}
