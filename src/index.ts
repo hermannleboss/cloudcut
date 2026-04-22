@@ -14,6 +14,7 @@
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
+		const statsMatch = url.pathname.match(/^\/api\/stats\/([a-f0-9]{8})$/i);
 
 		if (url.pathname === "/api/shorten") {
 			if (request.method !== "POST") {
@@ -80,6 +81,31 @@ export default {
 				},
 				{ status: 201 },
 			);
+		}
+
+		if (request.method === "GET" && statsMatch) {
+			const record = await env.cloudcut_db
+				.prepare(
+					"SELECT short_code, original_url, created_at, visit_count FROM links WHERE short_code = ?1 LIMIT 1",
+				)
+				.bind(statsMatch[1])
+				.first<{
+					short_code: string;
+					original_url: string;
+					created_at: string;
+					visit_count: number;
+				}>();
+
+			if (!record) {
+				return Response.json({ error: "Short code not found" }, { status: 404 });
+			}
+
+			return Response.json({
+				code: record.short_code,
+				originalUrl: record.original_url,
+				createdAt: record.created_at,
+				clicks: record.visit_count,
+			});
 		}
 
 		if (request.method === "GET") {

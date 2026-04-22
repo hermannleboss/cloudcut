@@ -116,6 +116,58 @@ describe("Hello World worker", () => {
 		expect(record?.visit_count).toBe(1);
 	});
 
+	it("returns stats for GET /api/stats/:code", async () => {
+		const createResponse = await worker.fetch(
+			new IncomingRequest("http://example.com/api/shorten", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ url: "https://example.com/articles/1" }),
+			}),
+			env,
+			createExecutionContext(),
+		);
+
+		const { shortCode } = (await createResponse.json()) as { shortCode: string };
+
+		await worker.fetch(
+			new IncomingRequest(`http://example.com/${shortCode}`, {
+				redirect: "manual",
+			}),
+			env,
+			createExecutionContext(),
+		);
+
+		const statsResponse = await worker.fetch(
+			new IncomingRequest(`http://example.com/api/stats/${shortCode}`),
+			env,
+			createExecutionContext(),
+		);
+
+		expect(statsResponse.status).toBe(200);
+		const json = (await statsResponse.json()) as {
+			code: string;
+			originalUrl: string;
+			createdAt: string;
+			clicks: number;
+		};
+
+		expect(json.code).toBe(shortCode);
+		expect(json.originalUrl).toBe("https://example.com/articles/1");
+		expect(json.createdAt).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+		expect(json.clicks).toBe(1);
+	});
+
+	it("returns 404 for GET /api/stats/:code when code is unknown", async () => {
+		const response = await worker.fetch(
+			new IncomingRequest("http://example.com/api/stats/deadbeef"),
+			env,
+			createExecutionContext(),
+		);
+
+		expect(response.status).toBe(404);
+		expect(await response.json()).toEqual({ error: "Short code not found" });
+	});
+
 	it("returns 404 when code is unknown", async () => {
 		const response = await worker.fetch(
 			new IncomingRequest("http://example.com/doesnotexist"),
