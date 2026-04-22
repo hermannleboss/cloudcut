@@ -10,8 +10,8 @@ http:
   headers:
     Content-Type: application/json
   body:
-    mode: json
-    raw: |
+    type: json
+    data: |
       {
         "url": "https://example.org/very/long/path"
       }

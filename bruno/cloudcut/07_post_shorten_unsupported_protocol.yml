@@ -10,8 +10,8 @@ http:
   headers:
     Content-Type: application/json
   body:
-    mode: json
-    raw: |
+    type: json
+    data: |
       {
         "url": "ftp://example.org/file.txt"
       }

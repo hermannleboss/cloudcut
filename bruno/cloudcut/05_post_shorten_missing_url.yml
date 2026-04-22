@@ -10,8 +10,8 @@ http:
   headers:
     Content-Type: application/json
   body:
-    mode: json
-    raw: |
+    type: json
+    data: |
       {
         "notUrl": "https://example.org"
       }

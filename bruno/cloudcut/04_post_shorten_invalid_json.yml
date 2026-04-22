@@ -10,8 +10,8 @@ http:
   headers:
     Content-Type: application/json
   body:
-    mode: text
-    raw: |
+    type: text
+    data: |
       { invalid json }
 
 runtime:
