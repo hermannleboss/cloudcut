@@ -168,6 +168,17 @@ describe("Hello World worker", () => {
 		expect(await response.json()).toEqual({ error: "Short code not found" });
 	});
 
+	it("returns 400 for GET /api/stats/:code when code format is invalid", async () => {
+		const response = await worker.fetch(
+			new IncomingRequest("http://example.com/api/stats/foo"),
+			env,
+			createExecutionContext(),
+		);
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: "Invalid short code" });
+	});
+
 	it("returns 404 when code is unknown", async () => {
 		const response = await worker.fetch(
 			new IncomingRequest("http://example.com/doesnotexist"),

@@ -14,7 +14,7 @@
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
-		const statsMatch = url.pathname.match(/^\/api\/stats\/([a-f0-9]{8})$/i);
+		const statsPrefix = "/api/stats/";
 
 		if (url.pathname === "/api/shorten") {
 			if (request.method !== "POST") {
@@ -83,12 +83,24 @@ export default {
 			);
 		}
 
-		if (request.method === "GET" && statsMatch) {
+		if (url.pathname.startsWith(statsPrefix)) {
+			if (request.method !== "GET") {
+				return Response.json(
+					{ error: "Method not allowed" },
+					{ status: 405, headers: { Allow: "GET" } },
+				);
+			}
+
+			const shortCode = url.pathname.slice(statsPrefix.length);
+			if (!/^[a-f0-9]{8}$/i.test(shortCode)) {
+				return Response.json({ error: "Invalid short code" }, { status: 400 });
+			}
+
 			const record = await env.cloudcut_db
 				.prepare(
 					"SELECT short_code, original_url, created_at, visit_count FROM links WHERE short_code = ?1 LIMIT 1",
 				)
-				.bind(statsMatch[1])
+				.bind(shortCode)
 				.first<{
 					short_code: string;
 					original_url: string;
