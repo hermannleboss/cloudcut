@@ -21,7 +21,12 @@
 			"database_id": "b56def1a-8d9f-4b3b-a2e2-bb91838f6bd2",
 			"remote": true
 		}
-	]
+	],
+	"assets": {
+		"directory": "./public/",
+		"binding": "ASSETS",
+		"not_found_handling": "none"
+	}
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
