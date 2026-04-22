@@ -26,4 +26,41 @@ describe("Hello World worker", () => {
 		const response = await SELF.fetch("https://example.com");
 		expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
 	});
+
+	it("creates a short URL with POST /api/shorten", async () => {
+		const request = new IncomingRequest("http://example.com/api/shorten", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ url: "https://example.org/very/long/path" }),
+		});
+
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+
+		expect(response.status).toBe(201);
+		const json = (await response.json()) as {
+			shortCode: string;
+			shortUrl: string;
+			originalUrl: string;
+		};
+
+		expect(json.originalUrl).toBe("https://example.org/very/long/path");
+		expect(json.shortCode).toMatch(/^[a-f0-9-]{8}$/i);
+		expect(json.shortUrl).toMatch(/^http:\/\/example.com\/[a-f0-9-]{8}$/i);
+	});
+
+	it("rejects invalid payload on POST /api/shorten", async () => {
+		const request = new IncomingRequest("http://example.com/api/shorten", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ url: "not-a-valid-url" }),
+		});
+
+		const response = await worker.fetch(request, env, createExecutionContext());
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({
+			error: "Field 'url' must be a valid URL",
+		});
+	});
 });
