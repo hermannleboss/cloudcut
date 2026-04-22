@@ -1,0 +1,23 @@
+info:
+  name: 02_post_shorten_success
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  auth: inherit
+  headers:
+    Content-Type: application/json
+  body:
+    mode: json
+    raw: |
+      {
+        "url": "https://example.org/very/long/path"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

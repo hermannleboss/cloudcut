@@ -1,0 +1,23 @@
+info:
+  name: 05_post_shorten_missing_url
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  auth: inherit
+  headers:
+    Content-Type: application/json
+  body:
+    mode: json
+    raw: |
+      {
+        "notUrl": "https://example.org"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

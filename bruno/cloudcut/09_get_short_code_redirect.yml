@@ -1,0 +1,15 @@
+info:
+  name: 09_get_short_code_redirect
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: https://cloudcut.hermannleboss.workers.dev/{{short_code}}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: false
+  maxRedirects: 0

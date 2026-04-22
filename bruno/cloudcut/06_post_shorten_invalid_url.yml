@@ -1,0 +1,23 @@
+info:
+  name: 06_post_shorten_invalid_url
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: https://cloudcut.hermannleboss.workers.dev/api/shorten
+  auth: inherit
+  headers:
+    Content-Type: application/json
+  body:
+    mode: json
+    raw: |
+      {
+        "url": "not-a-valid-url"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
